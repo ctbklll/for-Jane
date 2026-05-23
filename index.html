@@ -10,29 +10,25 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* แก้ไขปัญหาขอบขาวโดยการกำหนดให้ html และ body เต็มจอ 100% */
-        html, body {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(180deg, #ffe0e6 0%, #fba1b7 100%);
-            display: flex; justify-content: center; align-items: center;
-            font-family: 'Mali', cursive; overflow: hidden;
+        /* ปรับพื้นหลัง body ให้เป็นสีเดียวกับแอป */
+        body { 
+            margin: 0; padding: 0; 
+            background: linear-gradient(180deg, #ffe0e6 0%, #fba1b7 100%); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; font-family: 'Mali', cursive; overflow: hidden; 
         }
         
-        /* คอนเทนเนอร์หลักของแอป */
-        .mobile-container {
-            width: 100%; height: 100%;
-            max-width: 400px;
-            background: linear-gradient(180deg, #ffe0e6 0%, #fba1b7 100%);
-            position: relative;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 40px 20px; overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        .mobile-container { 
+            width: 100%; height: 100vh; 
+            background: linear-gradient(180deg, #ffe0e6 0%, #fba1b7 100%); 
+            position: relative; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            padding: 40px 20px; overflow: hidden; 
         }
         
         .hidden-player { position: absolute; width: 1px; height: 1px; top: -9999px; left: -9999px; opacity: 0; pointer-events: none; }
         
-        /* --- เค้กน่ารัก --- */
+        /* --- เค้กน่ารัก (คงเดิม) --- */
         .cake-area { position: relative; display: flex; justify-content: center; transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 5; transform: scale(1.4); }
         .cake { width: 240px; height: 140px; background: #fff0f3; border-radius: 30px 30px 15px 15px; position: relative; box-shadow: inset 0 -15px 0 rgba(255, 182, 193, 0.3), 0 15px 25px rgba(216, 27, 96, 0.15); border: 4px solid #fff; }
         .icing { width: 100%; height: 60px; background: #ff758c; border-radius: 25px 25px 30px 30px; position: absolute; top: -2px; left: 0; }
@@ -70,6 +66,7 @@
 
         /* --- บัตรกำนัล --- */
         .swal2-popup.no-bg-popup { background: transparent !important; box-shadow: none !important; }
+        .swal2-center { display: flex !important; justify-content: center !important; align-items: center !important; }
         .landscape-voucher { width: 340px; height: 130px; background: #fff; border-radius: 12px; position: relative; display: flex; align-items: center; border: 4px solid #ff758c; overflow: hidden; padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .v-pattern { width: 100%; height: 100%; border: 2px dashed #ffb6c1; border-radius: 6px; display: flex; }
         .v-left { flex: 3; display: flex; flex-direction: column; justify-content: center; padding-left: 20px; text-align: left; }
@@ -157,7 +154,7 @@
                             <div class="v-left">
                                 <div class="v-title">LOVE COUPON</div>
                                 <div class="v-text">สิทธิ์ตามใจคนสวย 1 วัน!<br>สั่งได้เลยค้าบ จะตามใจทุกอย่าง</div> 
-                                <div style="font-size: 10px; color: #aaa; margin-top: 4px; font-weight: 400;">ใช้ได้ตลอดชีพ 💖</div>
+                                <div class="superx-text" style="font-size: 10px; color: #aaa; margin-top: 4px; font-weight: 400;">ใช้ได้ตลอดชีพ 💖</div>
                             </div>
                             <div class="v-right">
                                 <div class="barcode">
@@ -168,7 +165,10 @@
                     </div>
                 `,
                 showConfirmButton: true, confirmButtonText: 'คนสวยรับทราบ', confirmButtonColor: '#ff758c',
-                background: 'transparent', customClass: { popup: 'no-bg-popup' }, backdrop: `rgba(255,182,193,0.6)`
+                background: 'transparent', 
+                customClass: { popup: 'no-bg-popup', container: 'swal2-center' }, 
+                backdrop: `rgba(255,182,193,0.6)`,
+                width: 'auto'
             });
         }
 
