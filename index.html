@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jane's Day</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; background-color: #2c2c2c; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Mali', cursive; overflow: hidden; }
+        
+        .mobile-container { width: 100%; max-width: 400px; height: 100vh; max-height: 850px; background: linear-gradient(180deg, #ffe0e6 0%, #fba1b7 100%); position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; overflow: hidden; }
+        .hidden-player { position: absolute; width: 1px; height: 1px; top: -9999px; left: -9999px; opacity: 0; pointer-events: none; }
+        
+        /* --- เค้กน่ารัก --- */
+        .cake-area { position: relative; display: flex; justify-content: center; transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 5; transform: scale(1.4); }
+        .cake { width: 240px; height: 140px; background: #fff0f3; border-radius: 30px 30px 15px 15px; position: relative; box-shadow: inset 0 -15px 0 rgba(255, 182, 193, 0.3), 0 15px 25px rgba(216, 27, 96, 0.15); border: 4px solid #fff; }
+        .icing { width: 100%; height: 60px; background: #ff758c; border-radius: 25px 25px 30px 30px; position: absolute; top: -2px; left: 0; }
+        .drip { position: absolute; background: #ff758c; border-radius: 0 0 50px 50px; }
+        .drip:nth-child(1) { width: 30px; height: 40px; top: 50px; left: 20px; }
+        .drip:nth-child(2) { width: 40px; height: 60px; top: 50px; left: 60px; }
+        .drip:nth-child(3) { width: 35px; height: 35px; top: 50px; left: 110px; }
+        .drip:nth-child(4) { width: 45px; height: 55px; top: 50px; left: 150px; }
+        .drip:nth-child(5) { width: 25px; height: 30px; top: 50px; left: 200px; }
+        .kawaii-face { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 40px; }
+        .eye { width: 15px; height: 15px; background: #57606f; border-radius: 50%; position: relative; animation: blink 3s infinite ease-in-out; }
+        @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+        .eye::after { content: ''; position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; top: 2px; right: 2px; }
+        .blush { width: 25px; height: 10px; background: rgba(255, 117, 140, 0.4); border-radius: 50%; position: absolute; top: 10px; }
+        .blush.left { left: -30px; } .blush.right { right: -30px; }
+        .mouth { position: absolute; width: 12px; height: 10px; border-bottom: 3px solid #57606f; border-radius: 50%; top: 0; }
+        .candle { width: 20px; height: 60px; background: #ffecb3; border: 3px solid #fff; border-radius: 10px; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); box-shadow: inset -4px 0 0 rgba(0,0,0,0.05); }
+        .candle::after { content: ''; position: absolute; width: 100%; height: 100%; background: repeating-linear-gradient(45deg, transparent, transparent 5px, #ff758c 5px, #ff758c 12px); border-radius: 6px; }
+        .wick { width: 3px; height: 10px; background: #333; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); border-radius: 50%; }
+        .flame { width: 28px; height: 40px; background: #ff9d00; border-radius: 50% 50% 20% 20%; position: absolute; top: -45px; left: 50%; transform: translateX(-50%); box-shadow: 0 0 20px #ff9d00, 0 0 40px #ffeb3b; cursor: pointer; animation: flicker 0.1s infinite alternate; z-index: 10; transition: all 0.3s ease; }
+        @keyframes flicker { 0% { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; } 100% { transform: translateX(-50%) scale(1.05) translateY(-2px); opacity: 0.9; } }
+        .smoke { width: 15px; height: 15px; background: rgba(255, 255, 255, 0.7); border-radius: 50%; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); opacity: 0; pointer-events: none; }
+        .smoke.active { animation: rise 2s ease-out forwards; }
+        @keyframes rise { 0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); filter: blur(2px); } 100% { opacity: 0; transform: translateX(-100%) translateY(-80px) scale(4); filter: blur(5px); } }
+
+        .greeting-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 35px 25px; border-radius: 30px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(216, 27, 96, 0.2); border: 4px solid #fff; position: absolute; bottom: -400px; opacity: 0; transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 20; }
+        .greeting-card.show { bottom: 30px; opacity: 1; }
+        .greeting-card h2 { color: #ff4757; margin-top: 0; font-size: 28px; }
+        .greeting-card p { color: #57606f; font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
+        .gift-btn { background: #ff758c; color: white; border: none; padding: 12px 30px; font-size: 18px; font-family: 'Mali', cursive; font-weight: 700; border-radius: 30px; cursor: pointer; box-shadow: 0 6px 15px rgba(255, 117, 140, 0.4); transition: transform 0.2s; }
+        .gift-btn:active { transform: scale(0.95); }
+
+        .floating-heart { position: absolute; font-size: 24px; pointer-events: none; animation: floatUp 1s ease-out forwards; z-index: 50; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-50px) scale(1.5); } }
+
+        /* --- บัตรกำนัล --- */
+        .swal2-popup.no-bg-popup { background: transparent !important; box-shadow: none !important; }
+        .swal2-center { display: flex !important; justify-content: center !important; align-items: center !important; }
+        .landscape-voucher { width: 340px; height: 130px; background: #fff; border-radius: 12px; position: relative; display: flex; align-items: center; border: 4px solid #ff758c; overflow: hidden; padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .v-pattern { width: 100%; height: 100%; border: 2px dashed #ffb6c1; border-radius: 6px; display: flex; }
+        .v-left { flex: 3; display: flex; flex-direction: column; justify-content: center; padding-left: 20px; text-align: left; }
+        .v-right { flex: 1; border-left: 2px dashed #ffb6c1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .v-title { font-size: 20px; font-weight: 900; color: #ff4757; }
+        .v-text { font-size: 12px; color: #555; margin-top: 5px; }
+        .barcode { height: 60px; width: 40px; display: flex; gap: 2px; }
+        .bar { width: 4px; background: #333; }
+        .bar:nth-child(2) { width: 2px; } .bar:nth-child(4) { width: 6px; } .bar:nth-child(6) { width: 3px; }
+
+        /* --- ข้อความบอกใบ้ --- */
+        .hint-text { position: absolute; color: #d81b60; background: rgba(255, 255, 255, 0.95); padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 16px; pointer-events: none; z-index: 100; box-shadow: 0 4px 10px rgba(216, 27, 96, 0.2); animation: hintFloat 1.5s ease-out forwards; }
+        @keyframes hintFloat { 0% { opacity: 1; transform: translate(-50%, 0) scale(0.8); } 20% { opacity: 1; transform: translate(-50%, -20px) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, -60px) scale(1); } }
+    </style>
+</head>
+<body>
+
+    <iframe id="yt-player" class="hidden-player" src="https://www.youtube.com/embed/NjJsAeB0gV0?enablejsapi=1&loop=1&playlist=NjJsAeB0gV0&start=6" frameborder="0" allow="autoplay"></iframe>
+
+    <div class="mobile-container" id="screen-area">
+        <div class="cake-area" id="cake">
+            <div class="cake">
+                <div class="icing"><div class="drip"></div><div class="drip"></div><div class="drip"></div><div class="drip"></div><div class="drip"></div></div>
+                <div class="kawaii-face"><div class="eye"><div class="blush left"></div></div><div class="mouth"></div><div class="eye"><div class="blush right"></div></div></div>
+                <div class="candle"><div class="wick"></div><div class="flame" id="flame" onclick="blowCandle(event)"></div><div class="smoke" id="smoke"></div></div>
+            </div>
+        </div>
+        <div class="greeting-card" id="greeting-card">
+            <h2>Happy Birthday</h2>
+            <p>คนอะไรเป่าเทียนเก่งจัง<br>ขอบคุณความรู้สึกดีๆที่มอบให้กันตลอดมานะคับ เค้าขอให้เป็นปีที่ดีของเธอนะ เธอจะมีเค้าอยู่ข้างๆตลอดปัยยย ดีมะ </p>
+            <button class="gift-btn" onclick="openGift()">กดรับคูปอง 🎁</button>
+        </div>
+    </div>
+
+    <script>
+        let musicStarted = false;
+        function startMusic() {
+            if (!musicStarted) {
+                const player = document.getElementById('yt-player');
+                player.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                musicStarted = true;
+            }
+        }
+        window.addEventListener('click', startMusic);
+        window.addEventListener('touchstart', startMusic);
+
+        let clickCount = 0;
+        function showHintMessage(text, x, y) {
+            const hint = document.createElement('div');
+            hint.className = 'hint-text';
+            hint.innerText = text;
+            const rect = document.getElementById('screen-area').getBoundingClientRect();
+            hint.style.left = `${x - rect.left}px`;
+            hint.style.top = `${y - rect.top - 50}px`;
+            document.getElementById('screen-area').appendChild(hint);
+            setTimeout(() => hint.remove(), 1500);
+        }
+
+        function blowCandle(event) {
+            event.stopPropagation(); startMusic(); clickCount++;
+            const flame = document.getElementById('flame');
+            if (clickCount === 1) { flame.style.transform = 'translateX(-50%) scale(0.6)'; flame.style.opacity = '0.7'; showHintMessage("ฟู่~", event.clientX, event.clientY); }
+            else if (clickCount === 2) { flame.style.transform = 'translateX(-50%) scale(0.3)'; flame.style.opacity = '0.4'; showHintMessage("จะดับเเล้ว", event.clientX, event.clientY); }
+            else if (clickCount === 3) {
+                flame.style.display = 'none'; document.getElementById('smoke').classList.add('active');
+                setTimeout(() => { document.getElementById('cake').style.transform = 'translateY(-120px) scale(0.9)'; document.getElementById('greeting-card').classList.add('show'); fireConfetti(); }, 800);
+            }
+        }
+
+        document.getElementById('screen-area').addEventListener('click', function(e) {
+            const heart = document.createElement('div');
+            heart.innerHTML = ['💖', '✨', '🧸', '🌸'][Math.floor(Math.random() * 4)];
+            heart.className = 'floating-heart';
+            const rect = this.getBoundingClientRect();
+            heart.style.left = `${e.clientX - rect.left - 12}px`;
+            heart.style.top = `${e.clientY - rect.top - 12}px`;
+            this.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        });
+
+        function openGift() {
+            Swal.fire({
+                html: `
+                    <div class="landscape-voucher">
+                        <div class="v-pattern">
+                            <div class="v-left">
+                                <div class="v-title">LOVE COUPON</div>
+                                <div class="v-text">สิทธิ์ตามใจคนสวย 1 วัน!<br>สั่งได้เลยค้าบ จะตามใจทุกอย่าง</div> 
+                                <div class="superx-text" style="font-size: 10px; color: #aaa; margin-top: 4px; font-weight: 400;">ใช้ได้ตลอดชีพ 💖</div>
+                            </div>
+                            <div class="v-right">
+                                <div class="barcode">
+                                    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: true, confirmButtonText: 'คนสวยรับทราบ', confirmButtonColor: '#ff758c',
+                background: 'transparent', 
+                customClass: { popup: 'no-bg-popup', container: 'swal2-center' }, 
+                backdrop: `rgba(255,182,193,0.6)`,
+                width: 'auto'
+            });
+        }
+
+        function fireConfetti() {
+            var duration = 3 * 1000; var end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff758c', '#ffffff', '#ffd700'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff758c', '#ffffff', '#ffd700'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
